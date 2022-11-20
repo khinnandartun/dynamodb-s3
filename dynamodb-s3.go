@@ -4,6 +4,8 @@ import (
 	"github.com/aws/aws-cdk-go/awscdk/v2"
 	// "github.com/aws/aws-cdk-go/awscdk/v2/awssqs"
 	"github.com/aws/constructs-go/constructs/v10"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awss3"
+	"github.com/aws/aws-cdk-go/awscdk/v2/awsdynamodb"
 	"github.com/aws/jsii-runtime-go"
 )
 
@@ -17,6 +19,22 @@ func NewDynamodbS3Stack(scope constructs.Construct, id string, props *DynamodbS3
 		sprops = props.StackProps
 	}
 	stack := awscdk.NewStack(scope, &id, &sprops)
+	//create s3 bucket
+	awss3.NewBucket(stack, jsii.String("MyBucket"), &awss3.BucketProps{
+		Versioned: jsii.Bool(false),
+		RemovalPolicy:     awscdk.RemovalPolicy_DESTROY,
+		AutoDeleteObjects: jsii.Bool(true),
+	})
+
+	//create dynamoDB
+	awsdynamodb.NewTable(stack, jsii.String("dynamodb-table"),
+		&awsdynamodb.TableProps{
+			PartitionKey: &awsdynamodb.Attribute{
+				Name: jsii.String("id"),
+				Type: awsdynamodb.AttributeType_STRING},
+			RemovalPolicy:     awscdk.RemovalPolicy_DESTROY,
+			// BillingMode: awsdynamodb.billingMode_PAY_PER_REQUEST
+		})
 
 	// The code that defines your stack goes here
 

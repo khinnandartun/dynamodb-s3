@@ -1,0 +1,95 @@
+{
+    "objects": [
+      {
+        "failureAndRerunMode": "CASCADE",
+        "schedule": {
+          "ref": "DefaultSchedule"
+        },
+        "resourceRole": "EC2InstanceProfileForImageBuilder",
+        "role": "DataPipelineTestRole",
+        "pipelineLogUri": "s3://mylogbucket-knt/",
+        "scheduleType": "cron",
+        "name": "Default",
+        "id": "Default"
+      },
+      {
+        "name": "EmrClusterForBackup",
+        "coreInstanceCount": "1",
+        "coreInstanceType": "m3.xlarge",
+        "releaseLabel": "emr-5.23.0",
+        "masterInstanceType": "m3.xlarge",
+        "id": "EmrClusterForBackup",
+        "region": "#{myDDBRegion}",
+        "type": "EmrCluster"
+      },
+      {
+        "period": "1 days",
+        "startDateTime": "2022-11-20T02:00:00",
+        "name": "Every 1 day",
+        "id": "DefaultSchedule",
+        "type": "Schedule"
+      },
+      {
+        "output": {
+          "ref": "S3BackupLocation"
+        },
+        "input": {
+          "ref": "DDBSourceTable"
+        },
+        "maximumRetries": "2",
+        "name": "TableBackupActivity",
+        "step": "s3://dynamodb-dpl-#{myDDBRegion}/emr-ddb-storage-handler/4.11.0/emr-dynamodb-tools-4.11.0-SNAPSHOT-jar-with-dependencies.jar,org.apache.hadoop.dynamodb.tools.DynamoDBExport,#{output.directoryPath},#{input.tableName},#{input.readThroughputPercent}",
+        "id": "TableBackupActivity",
+        "runsOn": {
+          "ref": "EmrClusterForBackup"
+        },
+        "type": "EmrActivity",
+        "resizeClusterBeforeRunning": "true"
+      },
+      {
+        "readThroughputPercent": "#{myDDBReadThroughputRatio}",
+        "name": "DDBSourceTable",
+        "id": "DDBSourceTable",
+        "type": "DynamoDBDataNode",
+        "tableName": "#{myDDBTableName}"
+      },
+      {
+        "directoryPath": "#{myOutputS3Loc}/#{format(@scheduledStartTime, 'YYYY-MM-dd-HH-mm-ss')}",
+        "name": "S3BackupLocation",
+        "id": "S3BackupLocation",
+        "type": "S3DataNode"
+      }
+    ],
+    "parameters": [
+      {
+        "description": "Output S3 folder",
+        "id": "myOutputS3Loc",
+        "type": "AWS::S3::ObjectKey"
+      },
+      {
+        "description": "Source DynamoDB table name",
+        "id": "myDDBTableName",
+        "type": "String"
+      },
+      {
+        "default": "0.25",
+        "watermark": "Enter value between 0.1-1.0",
+        "description": "DynamoDB read throughput ratio",
+        "id": "myDDBReadThroughputRatio",
+        "type": "Double"
+      },
+      {
+        "default": "us-east-1",
+        "watermark": "us-east-1",
+        "description": "Region of the DynamoDB table",
+        "id": "myDDBRegion",
+        "type": "String"
+      }
+    ],
+    "values": {
+      "myDDBRegion": "us-east-1",
+      "myDDBTableName": "DynamodbS3Stack-dynamodbtable650E77A7-1VUGXPXI89X1N",
+      "myDDBReadThroughputRatio": "0.25",
+      "myOutputS3Loc": "s3://dynamodbs3stack-mybucketf68f3ff0-1a46qum21b57v/"
+    }
+  }
