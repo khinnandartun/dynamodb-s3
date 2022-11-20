@@ -5,18 +5,14 @@ jobs:
   aws_cdk:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
+
+      - name: cdk deploy
+        uses: youyo/aws-cdk-github-actions@v2
         with:
-          node-version: "14"
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.ACCESS_KEY_SECRET }}
-          aws-region: ${{ secrets.AWS_REGION }}
-      - name: Install dependencies
-        run: yarn
-      - name: Deploy stack
-        run: yarn cdk deploy --all --require-approval never
+          cdk_subcommand: 'deploy'
+          cdk_args: '--require-approval never'
+          actions_comment: false
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_REGION }}
