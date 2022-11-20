@@ -2,9 +2,9 @@ name: 'Deploy to AWS CloudFormation'
 
 on: 
   push:
-    branches: [ master ]
+    branches: [ main ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -35,4 +35,3 @@ jobs:
           name: create-dynamoDB
           template: dynamodb-s3-stack.json
           no-fail-on-empty-changeset: "1"
-          parameter-overrides: "EC2InstanceType=t2.micro"
