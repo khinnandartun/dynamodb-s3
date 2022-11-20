@@ -1,5 +1,7 @@
 name: 'Run CDK for cloud formation'
 
+on: [push]
+
 jobs:
   aws_cdk:
     runs-on: ubuntu-latest
