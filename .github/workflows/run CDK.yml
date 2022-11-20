@@ -6,10 +6,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: cdk bootstrap
-        uses: tj-actions/aws-cdk@v3
+        uses: youyo/aws-cdk-github-actions@v2
         with:
           cdk_subcommand: "bootstrap"
-          cdk_extra_args: ${{ secrets.AWS_ENV }}
+          cdk_args: ${{ secrets.AWS_ENV }}
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
